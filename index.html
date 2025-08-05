@@ -1,0 +1,257 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Courts Christian Church</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Arial', sans-serif; }
+        .hero { background-image: url('https://source.unsplash.com/random/1600x900/?church'); background-size: cover; background-position: center; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Beautiful Courts Christian Church</h1>
+            <ul class="flex space-x-6">
+                <li><a href="#home" class="hover:underline">Home</a></li>
+                <li><a href="#about" class="hover:underline">About</a></li>
+                <li><a href="#events" class="hover:underline">Events</a></li>
+                <li><a href="#gallery" class="hover:underline">Gallery</a></li>
+                <li><a href="#apparel" class="hover:underline">Apparel</a></li>
+                <li><a href="#register" class="hover:underline">Register</a></li>
+                <li><a href="#giving" class="hover:underline">Giving</a></li>
+                <li><a href="#contact" class="hover:underline">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="hero h-screen flex items-center justify-center text-white">
+        <div class="text-center bg-black bg-opacity-50 p-8 rounded">
+            <h2 class="text-4xl font-bold mb-4">Welcome to Beautiful Courts</h2>
+            <p class="text-lg">Join us in worship and community as we grow in faith together in Nakuru, Kenya.</p>
+            <p class="text-lg font-semibold mt-4">2025 Theme: "Faith in Action"</p>
+            <a href="#register" class="mt-4 inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">Join Us</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">About Us</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">History</h3>
+                    <p>Founded in 2001, Beautiful Courts Christian Church has been a beacon of hope and faith in Nakuru, Kenya, spreading the love of Christ through service and worship.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Vision</h3>
+                    <p>To be a vibrant community of believers, transforming lives through the power of God's love and grace.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Mission</h3>
+                    <p>To spread the gospel, nurture spiritual growth, and serve our community with compassion and unity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="py-16 bg-gray-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Upcoming Events</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="text-xl font-semibold mb-2">Annual Prayer Conference</h3>
+                    <p><strong>Date:</strong> September 15, 2025</p>
+                    <p><strong>Location:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
+                    <p>Join us for a powerful time of prayer and worship.</p>
+                    <div id="countdown" class="mt-4 text-lg font-semibold"></div>
+                    <script>
+                        function countdown() {
+                            const eventDate = new Date("September 15, 2025 00:00:00").getTime();
+                            const now = new Date().getTime();
+                            const distance = eventDate - now;
+                            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                            document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                            if (distance < 0) {
+                                document.getElementById("countdown").innerHTML = "Event has started!";
+                            }
+                        }
+                        setInterval(countdown, 1000);
+                    </script>
+                </div>
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="text-xl font-semibold mb-2">Youth Revival Night</h3>
+                    <p><strong>Date:</strong> October 10, 2025</p>
+                    <p><strong>Location:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
+                    <p>An evening of music, testimonies, and inspiration for the youth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Gallery</h2>
+            <p class="text-center mb-8">Moments from our recent services, including last Sunday's worship. Email your photos to beautifulcourts2001@gmail.com to contribute!</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Replace these with your own image paths or URLs from ImgBB -->
+                <div><img src="images/sunday_service_1.jpg" alt="Sunday Service August 2025" class="w-full h-48 object-cover rounded"></div>
+                <div><img src="images/prayer_meeting.jpg" alt="Prayer Meeting 2025" class="w-full h-48 object-cover rounded"></div>
+                <div><img src="images/community_event.jpg" alt="Community Event 2025" class="w-full h-48 object-cover rounded"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Apparel Section -->
+    <section id="apparel" class="py-16 bg-gray-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Church Apparel</h2>
+            <p class="text-center mb-8">Show your faith with our exclusive Beautiful Courts apparel. Contact us to order!</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-4 rounded shadow">
+                    <img src="images/tshirt.jpg" alt="T-Shirt" class="w-full h-48 object-cover rounded">
+                    <h3 class="text-lg font-semibold mt-4">Church T-Shirt</h3>
+                    <p id="tshirt-price">KES 2,000</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow">
+                    <img src="images/hoodie.jpg" alt="Hoodie" class="w-full h-48 object-cover rounded">
+                    <h3 class="text-lg font-semibold mt-4">Church Hoodie</h3>
+                    <p id="hoodie-price">KES 3,500</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow">
+                    <img src="images/cap.jpg" alt="Cap" class="w-full h-48 object-cover rounded">
+                    <h3 class="text-lg font-semibold mt-4">Church Cap</h3>
+                    <p id="cap-price">KES 1,500</p>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <label for="currency" class="mr-2">Select Currency:</label>
+                <select id="currency" onchange="convertCurrency()">
+                    <option value="KES">KES</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                </select>
+            </div>
+            <script>
+                function convertCurrency() {
+                    const currency = document.getElementById('currency').value;
+                    const rates = { KES: 1, USD: 0.0077, EUR: 0.0071 }; // Update these rates periodically
+                    const prices = [
+                        { id: 'tshirt-price', kes: 2000 },
+                        { id: 'hoodie-price', kes: 3500 },
+                        { id: 'cap-price', kes: 1500 }
+                    ];
+                    prices.forEach(item => {
+                        const price = (item.kes * rates[currency]).toFixed(2);
+                        document.getElementById(item.id).innerText = `${currency} ${price}`;
+                    });
+                }
+            </script>
+        </div>
+    </section>
+
+    <!-- Register Section -->
+    <section id="register" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Visitor Registration</h2>
+            <p class="text-center mb-8">We'd love to connect with you! Please fill out the form below to register as a visitor.</p>
+            <div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+                <div class="space-y-4">
+                    <input type="text" placeholder="Full Name" class="w-full p-2 border rounded">
+                    <input type="email" placeholder="Email Address" class="w-full p-2 border rounded">
+                    <input type="tel" placeholder="Phone Number" class="w-full p-2 border rounded">
+                    <textarea placeholder="Message (Optional)" class="w-full p-2 border rounded"></textarea>
+                    <button class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700" onclick="alert('Form submitted! We will contact you at beautifulcourts2001@gmail.com.')">Submit</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Giving Section -->
+    <section id="giving" class="py-16 bg-gray-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Giving</h2>
+            <p class="text-center mb-8">Support our mission through your generous contributions.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+                <div class="bg-white p-6 rounded shadow text-center">
+                    <h3 class="text-xl font-semibold mb-4">M-Pesa</h3>
+                    <p>Paybill: 7082367</p>
+                    <p>Account: Beautiful Courts</p>
+                    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="alert('Please use the M-Pesa details to send your contribution.')">Donate Now</button>
+                </div>
+                <div class="bg-white p-6 rounded shadow text-center">
+                    <h3 class="text-xl font-semibold mb-4">PayPal</h3>
+                    <p>Email: jtajeu2001@gmail.com</p>
+                    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="window.open('https://paypal.com', '_blank')">Donate via PayPal</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
+            <p class="text-center mb-8">Reach out to us for any inquiries or to get involved!</p>
+            <div class="max-w-md mx-auto text-center">
+                <p><strong>Email:</strong> beautifulcourts2001@gmail.com</p>
+                <p><strong>Phone:</strong> +254720266684 or +254723640612</p>
+                <p><strong>Address:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        <p>&copy; 2025 Beautiful Courts Christian Church. All rights reserved.</p>
+    </footer>
+</body>
+</html>
