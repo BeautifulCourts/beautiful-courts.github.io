@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -54,135 +15,163 @@
         input::placeholder, textarea::placeholder { color: #fdba74; }
         button { background-color: #f97316; color: #000000; }
         button:hover { background-color: #ea580c; }
+        .heading-box { background-color: #000000; color: #f97316; padding: 0.5rem 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .heading-line { border-bottom: 2px solid #000000; margin-bottom: 1rem; }
+        .currency-select { background-color: #000000; color: #f97316; border: 1px solid #f97316; }
+        select option { background-color: #ffffff; color: #000000; }
     </style>
 </head>
-<body class="bg-black text-orange-500">
-    <!-- Navigation -->
-    <nav class="bg-orange-500 text-black p-4 fixed w-full top-0">
+<body class="bg-black text-orange-500 overflow-auto">
+    <nav class="bg-orange-500 text-black p-4 fixed w-full top-0 z-10">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Beautiful Courts Christian Church</h1>
-            <ul class="flex space-x-6">
+            <h1 class="text-lg font-bold sm:text-xl md:text-2xl">Beautiful Courts Christian Church</h1>
+            <ul class="flex space-x-2 text-xs sm:space-x-4 sm:text-sm md:space-x-6 md:text-base">
                 <li><a href="#home" class="hover:underline">Home</a></li>
                 <li><a href="#about" class="hover:underline">About</a></li>
                 <li><a href="#events" class="hover:underline">Events</a></li>
                 <li><a href="#gallery" class="hover:underline">Gallery</a></li>
                 <li><a href="#apparel" class="hover:underline">Apparel</a></li>
+                <li><a href="#branches" class="hover:underline">Branches</a></li>
                 <li><a href="#register" class="hover:underline">Register</a></li>
                 <li><a href="#giving" class="hover:underline">Giving</a></li>
                 <li><a href="#contact" class="hover:underline">Contact</a></li>
             </ul>
         </div>
     </nav>
-
-    <!-- Home Section -->
-    <section id="home" class="hero h-screen flex items-center justify-center text-orange-500">
-        <div class="text-center bg-black bg-opacity-80 p-8 rounded">
-            <h2 class="text-4xl font-bold mb-4">Welcome to Beautiful Courts</h2>
-            <p class="text-lg">Join us in worship and community as we grow in faith together in Nakuru, Kenya.</p>
-            <p class="text-lg font-semibold mt-4">2025 Theme: "Capacity For Conquest"</p>
-            <P class="text-lg font semibold mt-2"> Theme Verse: "Isaiah 54:2"</P>
-            <a href="#register" class="mt-4 inline-block bg-orange-500 text-black px-6 py-3 rounded hover:bg-orange-600">Join Us</a>
+    <section id="home" class="hero min-h-screen flex items-center justify-center text-orange-500 pt-16">
+        <div class="text-center bg-black bg-opacity-70 p-6 sm:p-8 rounded">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">Welcome to Beautiful Courts Christian Church</h2>
+            <p class="text-base sm:text-lg">Join us in worship and community as we grow in faith together in Nakuru, Kenya.</p>
+            <p class="text-base sm:text-lg font-semibold mt-4">Theme: Capacity for Conquest</p>
+            <p class="text-base sm:text-lg font-semibold mt-2">Scripture: Isaiah 54:2</p>
+            <div class="heading-box mt-4">
+                <a href="#register" class="inline-block bg-black text-orange-500 px-4 sm:px-6 py-2 sm:py-3 rounded border border-orange-500 hover:bg-orange-500 hover:text-black">Join Us</a>
+            </div>
         </div>
     </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-16 bg-orange-500 text-black">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">About Us</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="text-xl font-semibold mb-4">History</h3>
-                    <p>Founded in 2001, Beautiful Courts Christian Church has been a beacon of hope and faith in Nakuru, Kenya, spreading the love of Christ through service and worship.</p>
+    <section id="about" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">About Us</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">History</h3>
+                    <p class="text-sm sm:text-base">Founded in 2001, Beautiful Courts Christian Church has been a beacon of hope and faith in Nakuru, Kenya, spreading the love of Christ through service and worship.</p>
                 </div>
-                <div>
-                    <h3 class="text-xl font-semibold mb-4">Vision</h3>
-                    <p>Crown his people witn the beauty of his word the Word of dominion over all areas if their lives.</p>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Vision</h3>
+                    <p class="text-sm sm:text-base">Crown his people with the beauty of his word the Word of dominion over all areas of their lives.</p>
                 </div>
-                <div>
-                    <h3 class="text-xl font-semibold mb-4">Mission</h3>
-                    <p>Teaching ,training,transforming leading to truimph.</p>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Mission</h3>
+                    <p class="text-sm sm:text-base">Teaching, training, transforming leading to triumph.</p>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Events Section -->
-    <section id="events" class="py-16 bg-orange-500 text-black">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Upcoming Events</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="bg-black text-orange-500 p-6 rounded shadow">
-                    <h3 class="text-xl font-semibold mb-2">ANNUAL 18TH CONVENTION 2026</h3>
-                    <p><strong>Date:</strong> December 15, 2025</p>
-                    <p><strong>Location:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
-                    <p>Join us for a powerful time of prayer and worship.</p>
-                    <div id="countdown" class="mt-4 text-lg font-semibold"></div>
+    <section id="events" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Upcoming Events</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-2">Dominion Summit 2025</h3>
+                    <p class="text-sm sm:text-base"><strong>Date:</strong> December 8 - 14, 2025</p>
+                    <p class="text-sm sm:text-base"><strong>Location:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
+                    <p class="text-sm sm:text-base">Annual convention dubbed Dominion Summit 2025.</p>
+                    <div id="summit-countdown" class="mt-4 text-sm sm:text-lg font-semibold"></div>
+                    <button class="mt-4 bg-orange-500 text-black px-3 sm:px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base" onclick="alert('Reminder set for Dominion Summit 2025 on December 8 - 14, 2025!')">Set Reminder</button>
                     <script>
-                        function countdown() {
-                            const eventDate = new Date("December 15, 2025 00:00:00").getTime();
+                        function summitCountdown() {
+                            const eventDate = new Date("December 8, 2025 00:00:00").getTime();
                             const now = new Date().getTime();
                             const distance = eventDate - now;
                             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                            document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                            document.getElementById("summit-countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
                             if (distance < 0) {
-                                document.getElementById("countdown").innerHTML = "Event has started!";
+                                document.getElementById("summit-countdown").innerHTML = "Event has started!";
                             }
                         }
-                        setInterval(countdown, 1000);
+                        setInterval(summitCountdown, 1000);
                     </script>
                 </div>
-                <div class="bg-black text-orange-500 p-6 rounded shadow">
-                    <h3 class="text-xl font-semibold mb-2">Daughters Of Dominion Seminars</h3>
-                    <p><strong>Date:</strong> August 26th, 2025</p>
-                    <p><strong>Location:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
-                    <p>An evening of music, testimonies, and inspiration for the youth.</p>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-2">Narok Town First Anniversary</h3>
+                    <p class="text-sm sm:text-base"><strong>Date:</strong> September 23, 2025</p>
+                    <p class="text-sm sm:text-base"><strong>Location:</strong> Narok Town, Kenya</p>
+                    <p class="text-sm sm:text-base">Celebrate the first anniversary of our Narok Town branch.</p>
+                    <div id="narok-countdown" class="mt-4 text-sm sm:text-lg font-semibold"></div>
+                    <button class="mt-4 bg-orange-500 text-black px-3 sm:px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base" onclick="alert('Reminder set for Narok Town First Anniversary on September 23, 2025!')">Set Reminder</button>
+                    <script>
+                        function narokCountdown() {
+                            const eventDate = new Date("September 23, 2025 00:00:00").getTime();
+                            const now = new Date().getTime();
+                            const distance = eventDate - now;
+                            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                            document.getElementById("narok-countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                            if (distance < 0) {
+                                document.getElementById("narok-countdown").innerHTML = "Event has started!";
+                            }
+                        }
+                        setInterval(narokCountdown, 1000);
+                    </script>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Gallery Section -->
-    <section id="gallery" class="py-16">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Gallery</h2>
-            <p class="text-center mb-8">Moments from our recent services, including last Sunday's worship. Email your photos to beautifulcourts2001@gmail.com to contribute!</p>
+    <section id="gallery" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Gallery</h2>
+            </div>
+            <p class="text-center mb-8 text-sm sm:text-base">Moments from our recent services. Email photos to beautifulcourts2001@gmail.com to contribute!</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <!-- Replace these with your own image paths or URLs from ImgBB -->
-                <div><img src="images/sunday_service_1.jpg" alt="Sunday Service August 2025" class="w-full h-48 object-cover rounded"></div>
-                <div><img src="images/prayer_meeting.jpg" alt="Prayer Meeting 2025" class="w-full h-48 object-cover rounded"></div>
+                <div><img src="https://ibb.co/0R5Dz2MF" alt="Sunday Service August 2025" class="w-full h-48 object-cover rounded"></div>
+                <div><img src="https://ibb.co/Q3sXPfqy" alt="Prayer Meeting 2025" class="w-full h-48 object-cover rounded"></div>
                 <div><img src="images/community_event.jpg" alt="Community Event 2025" class="w-full h-48 object-cover rounded"></div>
             </div>
         </div>
     </section>
-
-    <!-- Apparel Section -->
-    <section id="apparel" class="py-16 bg-orange-500 text-black">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Church Apparel</h2>
-            <p class="text-center mb-8">Show your faith with our exclusive Beautiful Courts apparel. Contact us to order!</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-black text-orange-500 p-4 rounded shadow">
-                    <img src="https://ibb.co/zWSNgqpV" alt="T-Shirt" class="w-full h-48 object-cover rounded">
-                    <h3 class="text-lg font-semibold mt-4">Church T-Shirt</h3>
-                    <p id="tshirt-price">KES 2,000</p>
+    <section id="apparel" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Church Apparel</h2>
+            </div>
+            <p class="text-center mb-8 text-sm sm:text-base">Show your faith with our exclusive apparel. Click an item to select size, color, and more!</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <a href="https://forms.gle/your-google-form-link-for-tshirt" target="_blank" class="block">
+                        <img src="images/tshirt.jpg" alt="Church T-Shirt" class="w-full h-48 object-cover rounded">
+                        <h3 class="text-lg sm:text-xl font-semibold mt-4">Church T-Shirt</h3>
+                        <p id="tshirt-price" class="text-sm sm:text-base">KES 2,000</p>
+                    </a>
                 </div>
-                <div class="bg-black text-orange-500 p-4 rounded shadow">
-                    <img src="images/hoodie.jpg" alt="Hoodie" class="w-full h-48 object-cover rounded">
-                    <h3 class="text-lg font-semibold mt-4">Church Hoodie</h3>
-                    <p id="hoodie-price">KES 3,500</p>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <a href="https://forms.gle/your-google-form-link-for-hoodie" target="_blank" class="block">
+                        <img src="images/hoodie.jpg" alt="Church Hoodie" class="w-full h-48 object-cover rounded">
+                        <h3 class="text-lg sm:text-xl font-semibold mt-4">Church Hoodie</h3>
+                        <p id="hoodie-price" class="text-sm sm:text-base">KES 3,500</p>
+                    </a>
                 </div>
-                <div class="bg-black text-orange-500 p-4 rounded shadow">
-                    <img src="https://ibb.co/zWSNgqpV" alt="Cap" class="w-full h-48 object-cover rounded">
-                    <h3 class="text-lg font-semibold mt-4">Church Cap</h3>
-                    <p id="cap-price">KES 1,500</p>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <a href="https://forms.gle/your-google-form-link-for-cap" target="_blank" class="block">
+                        <img src="images/cap.jpg" alt="Church Cap" class="w-full h-48 object-cover rounded">
+                        <h3 class="text-lg sm:text-xl font-semibold mt-4">Church Cap</h3>
+                        <p id="cap-price" class="text-sm sm:text-base">KES 1,500</p>
+                    </a>
                 </div>
             </div>
             <div class="text-center mt-8">
-                <label for="currency" class="mr-2">Select Currency:</label>
-                <select id="currency" onchange="convertCurrency()">
+                <label for="currency" class="mr-2 text-sm sm:text-base">Select Currency:</label>
+                <select id="currency" class="currency-select p-2 rounded text-sm sm:text-base" onchange="convertCurrency()">
                     <option value="KES">KES</option>
                     <option value="USD">USD</option>
                     <option value="EUR">EUR</option>
@@ -191,7 +180,7 @@
             <script>
                 function convertCurrency() {
                     const currency = document.getElementById('currency').value;
-                    const rates = { KES: 1, USD: 0.0077, EUR: 0.0071 }; // Update these rates periodically
+                    const rates = { KES: 1, USD: 0.0077, EUR: 0.0071 };
                     const prices = [
                         { id: 'tshirt-price', kes: 2000 },
                         { id: 'hoodie-price', kes: 3500 },
@@ -205,61 +194,108 @@
             </script>
         </div>
     </section>
-
-    <!-- Register Section -->
-    <section id="register" class="py-16 bg-orange-500 text-black">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Visitor Registration</h2>
-            <p class="text-center mb-8">We'd love to connect with you! Please fill out the form below to register as a visitor.</p>
-            <div class="max-w-md mx-auto bg-black text-orange-500 p-6 rounded shadow">
-                <div class="space-y-4">
-                    <input type="text" placeholder="Full Name" class="w-full p-2 border rounded bg-black text-orange-500 placeholder-orange-300">
-                    <input type="email" placeholder="Email Address" class="w-full p-2 border rounded bg-black text-orange-500 placeholder-orange-300">
-                    <input type="tel" placeholder="Phone Number" class="w-full p-2 border rounded bg-black text-orange-500 placeholder-orange-300">
-                    <textarea placeholder="Message (Optional)" class="w-full p-2 border rounded bg-black text-orange-500 placeholder-orange-300"></textarea>
-                    <button class="w-full bg-orange-500 text-black p-2 rounded hover:bg-orange-600" onclick="alert('Form submitted! We will contact you at beautifulcourts2001@gmail.com.')">Submit</button>
+    <section id="branches" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Our Branches</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">HQ - Nakuru</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254720266684</p>
+                </div>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Nairobi Branch</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Nairobi, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254123456789</p>
+                </div>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Mombasa Branch</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Mombasa, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254987654321</p>
+                </div>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Kisumu Branch</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Kisumu, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254456789012</p>
+                </div>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Eldoret Branch</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Eldoret, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254789012345</p>
+                </div>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Nyeri Branch</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Nyeri, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254012345678</p>
+                </div>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Thika Branch</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Thika, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254567890123</p>
+                </div>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Narok Town Branch</h3>
+                    <p class="text-sm sm:text-base"><strong>Address:</strong> Narok Town, Kenya</p>
+                    <p class="text-sm sm:text-base"><strong>Phone:</strong> +254345678901</p>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Giving Section -->
-    <section id="giving" class="py-16 bg-orange-500 text-black">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Giving</h2>
-            <p class="text-center mb-8">Support our mission through your generous contributions.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-                <div class="bg-black text-orange-500 p-6 rounded shadow text-center">
-                    <h3 class="text-xl font-semibold mb-4">M-Pesa</h3>
-                    <p>Paybill: 7082367</p>
-                    <p>Account: Beautiful Courts</p>
-                    <button class="mt-4 bg-orange-500 text-black px-4 py-2 rounded hover:bg-orange-600" onclick="alert('Please use the M-Pesa details to send your contribution.')">Give Now</button>
+    <section id="register" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Visitor Registration</h2>
+            </div>
+            <p class="text-center mb-8 text-sm sm:text-base">We'd love to connect with you! Please fill out the form below to register as a visitor.</p>
+            <div class="max-w-md mx-auto card bg-black text-orange-500 p-4 sm:p-6 rounded shadow">
+                <form action="https://formspree.io/f/your-form-id" method="POST">
+                    <input type="text" name="name" placeholder="Full Name" class="w-full p-2 border rounded mb-4" required>
+                    <input type="email" name="email" placeholder="Email Address" class="w-full p-2 border rounded mb-4" required>
+                    <input type="tel" name="phone" placeholder="Phone Number" class="w-full p-2 border rounded mb-4">
+                    <textarea name="message" placeholder="Message (Optional)" class="w-full p-2 border rounded mb-4"></textarea>
+                    <button type="submit" class="w-full bg-orange-500 text-black p-2 rounded hover:bg-orange-600 text-sm sm:text-base">Submit</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <section id="giving" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Giving</h2>
+            </div>
+            <p class="text-center mb-8 text-sm sm:text-base">Support our mission to spread the gospel and transform lives through your generous contributions.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-2xl mx-auto">
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow text-center">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">M-Pesa</h3>
+                    <p class="text-sm sm:text-base"><strong>Paybill:</strong> 7082367</p>
+                    <p class="text-sm sm:text-base"><strong>Account:</strong> Beautiful Courts</p>
+                    <button class="mt-4 bg-orange-500 text-black px-3 sm:px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base" onclick="alert('Use M-Pesa Paybill 7082367, Account: Beautiful Courts to give.')">Give Now</button>
                 </div>
-                <div class="bg-black text-orange-500 p-6 rounded shadow text-center">
-                    <h3 class="text-xl font-semibold mb-4">PayPal</h3>
-                    <p>Email: jtajeu2001@gmail.com</p>
-                    <button class="mt-4 bg-orange-500 text-black px-4 py-2 rounded hover:bg-orange-600" onclick="window.open('https://paypal.com', '_blank')">Give via PayPal</button>
+                <div class="card bg-black text-orange-500 p-4 sm:p-6 rounded shadow text-center">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">PayPal</h3>
+                    <p class="text-sm sm:text-base"><strong>Email:</strong> jtajeu2001@gmail.com</p>
+                    <button class="mt-4 bg-orange-500 text-black px-3 sm:px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base" onclick="window.open('https://paypal.com', '_blank')">Give Now</button>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-16 bg-orange-500 text-black">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
-            <p class="text-center mb-8">Reach out to us for any inquiries or to get involved!</p>
+    <section id="contact" class="py-12 sm:py-16 bg-orange-500 text-black">
+        <div class="container mx-auto px-2 sm:px-4">
+            <div class="heading-box text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Contact Us</h2>
+            </div>
+            <p class="text-center mb-8 text-sm sm:text-base">Reach out for inquiries or to get involved!</p>
             <div class="max-w-md mx-auto text-center">
-                <p><strong>Email:</strong> beautifulcourts2001@gmail.com</p>
-                <p><strong>Phone:</strong> +254720266684 or +254723640612</p>
-                <p><strong>Address:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
+                <p class="text-sm sm:text-base"><strong>Email:</strong> beautifulcourts2001@gmail.com</p>
+                <p class="text-sm sm:text-base"><strong>Phone:</strong> +254720266684 or +254723640612</p>
+                <p class="text-sm sm:text-base"><strong>Address:</strong> Mawanga, Kwa Buda, Nakuru, Kenya</p>
             </div>
         </div>
     </section>
-
-    <!-- Footer -->
     <footer class="bg-orange-500 text-black p-4 text-center">
-        <p>&copy; 2025 Beautiful Courts Christian Church. All rights reserved.</p>
+        <p class="text-sm sm:text-base">&copy; 2025 Beautiful Courts Christian Church. All rights reserved.</p>
     </footer>
 </body>
 </html>
