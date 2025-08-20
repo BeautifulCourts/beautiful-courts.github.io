@@ -93,8 +93,7 @@
                     <button class="mt-4 bg-orange-500 text-black px-3 sm:px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base" onclick="alert('Reminder set for Dominion Summit 2025 on December 8 - 14, 2025!')">Set Reminder</button>
                     <script>
                         function summitCountdown() {
-                            const eventDate = new Date("December 8, 2025 00:00:00").getTime();
-                             setInterval(summitCountdown, 1000);
+                            const eventDate = new Date("2025-12-08T00:00:00Z").getTime();
                             const now = new Date().getTime();
                             const distance = eventDate - now;
                             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
