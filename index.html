@@ -94,6 +94,7 @@
                     <script>
                         function summitCountdown() {
                             const eventDate = new Date("December 8, 2025 00:00:00").getTime();
+                             setInterval(summitCountdown, 1000);
                             const now = new Date().getTime();
                             const distance = eventDate - now;
                             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -144,7 +145,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div><img src="https://i.imgur.com/NmrWfiK.jpeg" alt="Sunday Service August 2025" class="w-full h-48 object-cover rounded"></div>
                 <div><img src="https://i.imgur.com/GLC3l8M.jpeg" alt="Prayer Meeting 2025" class="w-full h-48 object-cover rounded"></div>
-                <div><img src="images/community_event.jpg" alt="Community Event 2025" class="w-full h-48 object-cover rounded"></div>
+                <div><img src="https://i.imgur.com/Ren8yYf.jpeg" alt="Community Event 2025" class="w-full h-48 object-cover rounded"></div>
             </div>
         </div>
     </section>
